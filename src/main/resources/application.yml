@@ -1,0 +1,26 @@
+spring:
+  spring:
+    datasource:
+      url: jdbc:mysql://localhost:3306/holidaymailer
+      username: root
+      password: yourpass
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: fplive@foxmail.com
+    password: kpcbkdaodvdcdggh
+    protocol: smtps
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+  application:
+    name: holiday-mailer
+
+
