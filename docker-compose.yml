@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: holiday_pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: holidaymailer
+      POSTGRES_USER: mailer
+      POSTGRES_PASSWORD: secret123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  # 预留 Kafka（后续使用）
+  # kafka:
+  #   image: bitnami/kafka:latest
+  #   ...
+
+volumes:
+  pgdata:

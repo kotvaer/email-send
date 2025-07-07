@@ -1,13 +1,13 @@
 spring:
-  spring:
-    datasource:
-      url: jdbc:mysql://localhost:3306/holidaymailer
-      username: root
-      password: yourpass
-    jpa:
-      hibernate:
-        ddl-auto: update
-      show-sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/holidaymailer
+    username: mailer
+    password: secret123
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
   mail:
     host: smtp.qq.com
     port: 465
@@ -22,5 +22,11 @@ spring:
             enable: true
   application:
     name: holiday-mailer
+
+coze:
+  api:
+    apiUrl: "https://api.coze.cn/v1/workflow/stream_run"
+    token: "Bearer cztei_lIlDDi7NfF9KoJt6JUUzXU6cofPpprIhRxuOy8ZOD4rnNAzRW163KtiNcgTilGa8i"
+    workFlowId: "7524227986921783342"
 
 
