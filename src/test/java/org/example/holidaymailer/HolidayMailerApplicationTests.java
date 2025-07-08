@@ -1,9 +1,10 @@
 package org.example.holidaymailer;
 
 import org.example.holidaymailer.controller.CozeApiClient;
+import org.example.holidaymailer.entity.EmailMessage;
+import org.example.holidaymailer.service.EmailService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
@@ -16,15 +17,15 @@ class HolidayMailerApplicationTests {
 
     @Test
     void contextLoads() {
-        emailService.sendMail(
-                "epiiplus@outlook.com",
-                "节日快乐！🎉",
-                "亲爱的同事，今天是法定节假日，祝您节日快乐、阖家幸福！"
+        emailService.sendEmail(
+                EmailMessage.of("epiiplus@outlook.com",
+                        "节日快乐！🎉",
+                        "亲爱的同事，今天是法定节假日，祝您节日快乐、阖家幸福！")
         );
     }
 
     @Test
-    void emailServiceTestAync() {
+    void emailServiceTestAsync() {
         cozeApiClient.callCozeApi("shy", "国庆节", false)
                 .subscribe(
                         data -> System.out.println("Received: " + data),

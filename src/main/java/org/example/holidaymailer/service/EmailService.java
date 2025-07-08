@@ -1,5 +1,6 @@
-package org.example.holidaymailer;
+package org.example.holidaymailer.service;
 
+import org.example.holidaymailer.entity.EmailMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -15,17 +16,12 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String from;
 
-    public void sendMail(String to, String subject) {
-
-    }
-
-    public void sendMail(String to, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(from);
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(text);
-        mailSender.send(message);
+    public void sendEmail(EmailMessage message) {
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(message.to());
+        mail.setSubject(message.subject());
+        mail.setText(message.content());
+        mailSender.send(mail);
     }
 
 

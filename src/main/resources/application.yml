@@ -22,6 +22,26 @@ spring:
             enable: true
   application:
     name: holiday-mailer
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: email-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        linger.ms: 10         # 聚合更多消息后再发送
+        batch.size: 16384     # 每批发送16KB
+        compression.type: lz4 # 压缩提升吞吐（可用 snappy, gzip）
+    listener:
+      concurrency: 3          # 每个消费者组开启 3 个线程并行消费
+      ack-mode: manual        # 手动提交 offset（确保邮件发送后再提交）
 
 coze:
   api:

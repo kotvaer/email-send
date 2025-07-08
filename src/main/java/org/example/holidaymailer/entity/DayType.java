@@ -11,7 +11,6 @@ public enum DayType {
         this.content = content;
     }
 
-
     public String getContent() {
         return content;
     }
