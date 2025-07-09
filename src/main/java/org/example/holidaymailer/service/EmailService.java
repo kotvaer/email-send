@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -46,33 +47,43 @@ public class EmailService {
         );
     }
 
-    public void sendEmailGenFromBot(String name, String email, String subject) throws Exception {
-        sendEmail(
-                name,
-                email,
-                subject,
-                cozeBot.genContent(name, subject));
+    private CompletableFuture<Void> sendEmailAsync(String name, String email, String subject, String content) throws Exception {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                sendEmail(name, email, subject, content);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }, executor);
     }
 
-    public CompletableFuture<Void> sendEmailGenFromBotAsync(String name, String email, String subject, Executor executor) throws Exception {
-        return CompletableFuture.supplyAsync(() -> {
+
+    private CompletableFuture<Void> sendEmailGenFromBotAsync(String name, String email, String subject, Executor executor) throws Exception {
+        return cozeBot.genContentAsync(name, subject)
+                .thenCompose(content -> {
                     try {
-                        return cozeBot.genContent(name, subject);
+                        return sendEmailAsync(name, email, subject, content);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                }, executor)
-                .thenAcceptAsync(
-                        content -> {
-                            try {
-                                sendEmail(name, email, subject, content);
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        }, executor);
+                });
     }
 
     public CompletableFuture<Void> sendEmailGenFromBotAsync(String name, String email, String subject) throws Exception {
         return sendEmailGenFromBotAsync(name, email, subject, executor);
+    }
+
+
+    // 新增 Reactor Mono 异步方法，基于 CozeBot 的 callReactive() 和 WebClient
+    public Mono<Void> sendEmailGenFromBotReactive(String name, String email, String subject) throws Exception {
+        return cozeBot.genContentReactive(name, subject)
+                .flatMap(content ->
+                {
+                    try {
+                        return Mono.fromFuture(sendEmailAsync(name, email, subject, content));
+                    } catch (Exception e) {
+                        return Mono.error(new RuntimeException(e));
+                    }
+                });
     }
 }

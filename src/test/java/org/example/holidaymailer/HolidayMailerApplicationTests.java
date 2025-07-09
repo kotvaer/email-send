@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 
 @SpringBootTest
@@ -57,17 +58,18 @@ class HolidayMailerApplicationTests {
 
     @Test
     void cozeBotTest() throws Exception {
-        RunWorkflowResp resp = cozeBot.call("shy", "生日");
+        CompletableFuture<RunWorkflowResp> respCompletableFuture = cozeBot.callAsync("shy", "生日");
+        RunWorkflowResp resp = respCompletableFuture.get();
         System.out.println(resp.getData());
         System.out.println(jsonParser.getMessageFromJson(resp.getData()));
     }
 
     @Test
     void cozeBotTestSync() throws Exception {
-        emailService.sendEmailGenFromBot(
+        emailService.sendEmailGenFromBotAsync(
                 "shy",
                 "epiiplus@outlook.com",
-                "生日快乐!");
+                "生日快乐!").join();
     }
 
     @Test
@@ -75,8 +77,21 @@ class HolidayMailerApplicationTests {
         emailService.sendEmailGenFromBotAsync(
                 "shy",
                 "epiiplus@outlook.com",
-                "暑假快乐🎉!",
-                Executors.newVirtualThreadPerTaskExecutor()).join();
+                "上班快乐🎉!").join();
+    }
+
+    @Test
+    void cozeBotTestReactive() throws Exception {
+        emailService.sendEmailGenFromBotReactive(
+                "shy",
+                "epiiplus@outlook.com",
+                "暑假快乐🎉!").block();
+    }
+
+    @Test
+    void cozeBotASync() throws Exception {
+        RunWorkflowResp block = cozeBot.callReactive("shy", "春节").block();
+        System.out.println(block.getData());
     }
 
 

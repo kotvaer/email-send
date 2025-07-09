@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Component
 public class MailTask {
@@ -46,7 +44,6 @@ public class MailTask {
                         throw new RuntimeException(e);
                     }
                 });
-
     }
 
 
