@@ -1,7 +1,6 @@
 package org.example.holidaymailer.tools;
 
-import org.example.holidaymailer.controller.CozeApiClient;
-import org.example.holidaymailer.entity.Employee;
+import org.example.holidaymailer.entity.NameEmail;
 import org.example.holidaymailer.repository.EmployeeRepository;
 import org.example.holidaymailer.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 public class MailTask {
@@ -21,27 +22,31 @@ public class MailTask {
     @Autowired
     private EmailService emailService;
 
-    @Autowired
-    CozeApiClient cozeApiClient;
-
     @Scheduled(cron = "0 0 8 * * *") // 定时任务
     public void sendBirthdayGreetings() {
         LocalDate today = LocalDate.now();
 
         // 根据当天日期获取当天生日的员工列表
-        List<Employee> employees = employeeRepo.findByBirthdayMonthAndDay(
+        List<NameEmail> nameEmails = employeeRepo.findNameEmailByBirthday(
                 today.getMonthValue(),
                 today.getDayOfMonth());
 
+        String subject = "生日快乐！";
 
-        employees.parallelStream()
-                .forEach(employee -> {
-                    cozeApiClient.callCozeApiSendEmailAsync(employee.getName(),
-                            null,
-                            true,
-                            employee.getEmail(),
-                            "生日快乐");
+
+        nameEmails.parallelStream()
+                .forEach(nameEmail -> {
+                    try {
+                        emailService.sendEmailGenFromBotAsync(
+                                nameEmail.getName(),
+                                nameEmail.getEmail(),
+                                subject
+                        );
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 });
+
     }
 
 
@@ -50,16 +55,22 @@ public class MailTask {
         Optional<String> opts = DateTools.haveItOrNot(LocalDate.now());
         if (opts.isEmpty()) return;
 
-        LocalDate today = LocalDate.now();
-        List<String> emails = employeeRepo.findAllEmails();
+        List<NameEmail> nameEmails = employeeRepo.findAllNameEmails();
 
-        emails.parallelStream()
-                .forEach(email -> {
-                    cozeApiClient.callCozeApiSendEmailAsync(null,
-                            opts.get(),
-                            false,
-                            email,
-                            opts.get());
+        String subject = opts.get();
+
+        nameEmails.parallelStream()
+                .forEach(nameEmail -> {
+                    try {
+                        emailService.sendEmailGenFromBotAsync(
+                                nameEmail.getName(),
+                                nameEmail.getEmail(),
+                                subject
+                        );
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 });
+
     }
 }

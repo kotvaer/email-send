@@ -45,8 +45,18 @@ spring:
 
 coze:
   api:
-    apiUrl: "https://api.coze.cn/v1/workflow/stream_run"
-    token: "Bearer cztei_lIlDDi7NfF9KoJt6JUUzXU6cofPpprIhRxuOy8ZOD4rnNAzRW163KtiNcgTilGa8i"
-    workFlowId: "7524227986921783342"
+    baseUrl: "https://api.coze.cn/"
+    token: "pat_O0kRoO54XpYDXJsibUFHeCH1ckvkErCMXjJszWq1v5TQgAkc1HifxllfQsCxSqW4"
+    workflowId: "7524227986921783342"
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  metrics:
+    tags:
+      application: ai-mail-service
 
 
