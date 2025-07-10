@@ -118,4 +118,19 @@ class HolidayMailerApplicationTests {
     }
 
 
+    @Test
+    void easyStressTest() {
+        employeeRepository
+                .findAllNameEmails()
+                .parallelStream()
+                .forEach(
+                        tuple ->
+                        emailService.sendEmailGenFromBotAsync(
+                                tuple.getName(),
+                                tuple.getEmail(),
+                                "工作愉快！").join()
+                );
+    }
+
+
 }

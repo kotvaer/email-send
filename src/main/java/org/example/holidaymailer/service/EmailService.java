@@ -2,6 +2,8 @@ package org.example.holidaymailer.service;
 
 import org.example.holidaymailer.config.CozeBot;
 import org.example.holidaymailer.entity.EmailMessage;
+import org.example.holidaymailer.entity.NameEmail;
+import org.example.holidaymailer.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +12,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -28,6 +31,9 @@ public class EmailService {
     @Qualifier("virtualThreadExecutor")
     @Autowired
     private Executor executor;
+
+    @Autowired
+    EmployeeRepository employeeRepository;
 
     public void sendEmail(EmailMessage message) {
         SimpleMailMessage mail = new SimpleMailMessage();
@@ -58,7 +64,7 @@ public class EmailService {
     }
 
 
-    private CompletableFuture<Void> sendEmailGenFromBotAsync(String name, String email, String subject, Executor executor) throws Exception {
+    private CompletableFuture<Void> sendEmailGenFromBotAsync(String name, String email, String subject, Executor executor) {
         return cozeBot.genContentAsync(name, subject)
                 .thenCompose(content -> {
                     try {
@@ -69,7 +75,7 @@ public class EmailService {
                 });
     }
 
-    public CompletableFuture<Void> sendEmailGenFromBotAsync(String name, String email, String subject) throws Exception {
+    public CompletableFuture<Void> sendEmailGenFromBotAsync(String name, String email, String subject) {
         return sendEmailGenFromBotAsync(name, email, subject, executor);
     }
 
@@ -85,5 +91,25 @@ public class EmailService {
                         return Mono.error(new RuntimeException(e));
                     }
                 });
+    }
+
+
+    public void sendAsyncList(List<NameEmail> nameEmails, String subject) {
+        nameEmails.parallelStream()
+                .forEach(nameEmail -> {
+                    try {
+                        sendEmailGenFromBotAsync(
+                                nameEmail.getName(),
+                                nameEmail.getEmail(),
+                                subject
+                        );
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
+
+    public void infoAll(String subject) {
+        sendAsyncList(employeeRepository.findAllNameEmails(), subject);
     }
 }

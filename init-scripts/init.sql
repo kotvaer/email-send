@@ -62,5 +62,4 @@ EXECUTE FUNCTION update_timestamp_column();
 
 -- 插入员工数据
 INSERT INTO employee (email, name, birthday) VALUES
-                                       ('epiiplus@outlook.com', 'epii','2025-10-01'),
-                                       ('lanran408@gmial.com', 'lanran','2025-10-07');
+                                       ('epiiplus@outlook.com', 'epii','2025-10-01');

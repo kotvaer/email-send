@@ -69,7 +69,6 @@ public class EmailSendRecord {
     @Column(name = "update_time", nullable = false)
     private LocalDateTime updateTime;
 
-    // --- Constructors ---
     public EmailSendRecord() {
         this.status = "PENDING";
         this.retryCount = 0;

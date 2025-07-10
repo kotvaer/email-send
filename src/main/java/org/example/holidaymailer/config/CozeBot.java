@@ -69,7 +69,7 @@ public class CozeBot {
         return callAsync(data);
     }
 
-    public CompletableFuture<String> genContentAsync(String name, String subject) throws Exception {
+    public CompletableFuture<String> genContentAsync(String name, String subject) {
         return callAsync(name, subject).thenApplyAsync(content -> {
                     try {
                         return jsonParser.getMessageFromJson(content.getData());

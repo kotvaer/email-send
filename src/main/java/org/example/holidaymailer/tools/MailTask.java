@@ -4,7 +4,6 @@ import org.example.holidaymailer.entity.NameEmail;
 import org.example.holidaymailer.repository.EmployeeRepository;
 import org.example.holidaymailer.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -31,18 +30,7 @@ public class MailTask {
 
         String subject = "生日快乐！";
 
-        nameEmails.parallelStream()
-                .forEach(nameEmail -> {
-                    try {
-                        emailService.sendEmailGenFromBotAsync(
-                                nameEmail.getName(),
-                                nameEmail.getEmail(),
-                                subject
-                        );
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        emailService.sendAsyncList(nameEmails, subject);
     }
 
 
@@ -55,18 +43,7 @@ public class MailTask {
 
         String subject = opts.get();
 
-        nameEmails.parallelStream()
-                .forEach(nameEmail -> {
-                    try {
-                        emailService.sendEmailGenFromBotAsync(
-                                nameEmail.getName(),
-                                nameEmail.getEmail(),
-                                subject
-                        );
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        emailService.sendAsyncList(nameEmails, subject);
 
     }
 }

@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/holidaymailer
+    username: mailer
+    password: secret123
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: fplive@foxmail.com
+    password: kpcbkdaodvdcdggh
+    protocol: smtps
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+  application:
+    name: holiday-mailer
+
+coze:
+  api:
+    baseUrl: "https://api.coze.cn/"
+    token: "pat_O0kRoO54XpYDXJsibUFHeCH1ckvkErCMXjJszWq1v5TQgAkc1HifxllfQsCxSqW4"
+    workflowId: "7524227986921783342"
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  metrics:
+    tags:
+      application: ai-mail-service
+
+
