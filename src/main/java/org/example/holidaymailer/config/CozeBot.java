@@ -30,7 +30,6 @@ public class CozeBot {
     @Autowired
     Executor executor;
 
-    // 构造注入
     public CozeBot(@Value("${coze.api.baseUrl}") String baseUrl,
                    @Value("${coze.api.token}") String token,
                    @Value("${coze.api.workflowId}") String workflowId,
@@ -42,7 +41,7 @@ public class CozeBot {
         this.webClient = webClientBuilder.baseUrl(baseUrl).build();
         this.jsonParser = jsonParser;
 
-        initCozeClient(); // 初始化 client
+        initCozeClient();
     }
 
     // 只初始化一次

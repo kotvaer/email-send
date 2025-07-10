@@ -1,6 +1,7 @@
 -- 删除所有表（如果存在）
 DROP TABLE IF EXISTS email_log;
 DROP TABLE IF EXISTS employee;
+DROP TABLE IF EXISTS email_send_record;
 DROP TABLE IF EXISTS email_send_records;
 
 

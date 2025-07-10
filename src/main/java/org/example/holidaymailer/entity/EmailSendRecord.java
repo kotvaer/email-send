@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "email_send_record")
+@Table(name = "email_send_records")
 public class EmailSendRecord {
 
     @Id
