@@ -3,8 +3,11 @@ package org.example.holidaymailer;
 import com.coze.openapi.client.workflows.run.RunWorkflowResp;
 import org.example.holidaymailer.config.CozeBot;
 import org.example.holidaymailer.entity.EmailMessage;
+import org.example.holidaymailer.entity.EmailSendRecord;
+import org.example.holidaymailer.entity.NameEmail;
 import org.example.holidaymailer.repository.EmployeeRepository;
 import org.example.holidaymailer.service.EmailService;
+import org.example.holidaymailer.service.EmailTaskService;
 import org.example.holidaymailer.tools.DateTools;
 import org.example.holidaymailer.tools.JsonParser;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 
@@ -29,6 +33,10 @@ class HolidayMailerApplicationTests {
 
     @Autowired
     JsonParser jsonParser;
+
+
+    @Autowired
+    EmailTaskService emailTaskService;
 
     @Test
     void sendEmail() {
@@ -51,9 +59,9 @@ class HolidayMailerApplicationTests {
 
 
     @Test
-    void dateTools(){
-        DateTools.haveItOrNot(LocalDate.of(2025,10,6)).ifPresent(System.out::println);
-        DateTools.haveItOrNot(LocalDate.of(2025,10,1)).ifPresent(System.out::println);
+    void dateTools() {
+        DateTools.haveItOrNot(LocalDate.of(2025, 10, 6)).ifPresent(System.out::println);
+        DateTools.haveItOrNot(LocalDate.of(2025, 10, 1)).ifPresent(System.out::println);
     }
 
     @Test
@@ -92,6 +100,21 @@ class HolidayMailerApplicationTests {
     void cozeBotASync() throws Exception {
         RunWorkflowResp block = cozeBot.callReactive("shy", "春节").block();
         System.out.println(block.getData());
+    }
+
+    @Test
+    void cozeBotASyncWithRetry() {
+        List<NameEmail> nameEmails = employeeRepository.findNameEmailByBirthday(10, 1);
+        nameEmails.stream()
+                .peek(System.out::println)
+                .map(nameEmail -> nameEmail.toEmailSendRecord("生日快乐"))
+                .forEach(it -> {
+                    try {
+                        emailTaskService.processEmailSendRecord(it).join();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
 

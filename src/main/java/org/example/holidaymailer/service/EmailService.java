@@ -47,7 +47,7 @@ public class EmailService {
         );
     }
 
-    private CompletableFuture<Void> sendEmailAsync(String name, String email, String subject, String content) throws Exception {
+    CompletableFuture<Void> sendEmailAsync(String name, String email, String subject, String content) {
         return CompletableFuture.runAsync(() -> {
             try {
                 sendEmail(name, email, subject, content);

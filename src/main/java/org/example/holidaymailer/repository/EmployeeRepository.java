@@ -17,13 +17,13 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Query("SELECT e FROM Employee e WHERE MONTH(e.birthday) = :month AND DAY(e.birthday) = :day")
     List<Employee> findByBirthday(@Param("month") int month, @Param("day") int day);
 
-    @Query("SELECT e.name AS name,e.email AS email FROM Employee e WHERE MONTH(e.birthday) = :month AND DAY(e.birthday) = :day")
+    @Query("SELECT e.id AS id, e.name AS name,e.email AS email FROM Employee e WHERE MONTH(e.birthday) = :month AND DAY(e.birthday) = :day")
     List<NameEmail> findNameEmailByBirthday(@Param("month") int month, @Param("day") int day);
 
     @Query("SELECT e.email FROM Employee e")
     List<String> findAllEmails();
 
-    @Query("SELECT e.name AS name,e.email AS email FROM Employee e")
+    @Query("SELECT e.id AS id, e.name AS name, e.email AS email FROM Employee e")
     List<NameEmail> findAllNameEmails();
 
 

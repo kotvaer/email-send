@@ -3,6 +3,7 @@ package org.example.holidaymailer.tools;
 import org.example.holidaymailer.entity.NameEmail;
 import org.example.holidaymailer.repository.EmployeeRepository;
 import org.example.holidaymailer.service.EmailService;
+import org.example.holidaymailer.service.EmailTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -12,15 +13,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class MailTask {
+public class MailTaskWithRetry {
 
     @Autowired
     private EmployeeRepository employeeRepo;
 
     @Autowired
-    private EmailService emailService;
+    private EmailTaskService emailTaskService;
 
-    //@Scheduled(cron = "0 0 8 * * *") // 定时任务
+    @Scheduled(cron = "0 0 8 * * *") // 定时任务
     public void sendBirthdayGreetings() {
         LocalDate today = LocalDate.now();
 
@@ -29,16 +30,17 @@ public class MailTask {
                 today.getMonthValue(),
                 today.getDayOfMonth());
 
+        if (nameEmails.isEmpty()) {
+            return;
+        }
+
         String subject = "生日快乐！";
 
         nameEmails.parallelStream()
-                .forEach(nameEmail -> {
+                .map(nameEmail -> nameEmail.toEmailSendRecord(subject))
+                .forEach(emailSendRecord -> {
                     try {
-                        emailService.sendEmailGenFromBotAsync(
-                                nameEmail.getName(),
-                                nameEmail.getEmail(),
-                                subject
-                        );
+                        emailTaskService.processEmailSendRecord(emailSendRecord);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -46,7 +48,7 @@ public class MailTask {
     }
 
 
-    //@Scheduled(cron = "0 8 14 * * *") // 定时任务执行
+    @Scheduled(cron = "0 8 14 * * *") // 定时任务执行
     public void sendHolidayGreeting() {
         Optional<String> opts = DateTools.haveItOrNot(LocalDate.now());
         if (opts.isEmpty()) return;
@@ -56,17 +58,13 @@ public class MailTask {
         String subject = opts.get();
 
         nameEmails.parallelStream()
-                .forEach(nameEmail -> {
+                .map(nameEmail -> nameEmail.toEmailSendRecord(subject))
+                .forEach(emailSendRecord -> {
                     try {
-                        emailService.sendEmailGenFromBotAsync(
-                                nameEmail.getName(),
-                                nameEmail.getEmail(),
-                                subject
-                        );
+                        emailTaskService.processEmailSendRecord(emailSendRecord);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 });
-
     }
 }
