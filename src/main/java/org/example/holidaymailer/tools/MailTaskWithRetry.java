@@ -48,7 +48,7 @@ public class MailTaskWithRetry {
     }
 
 
-    @Scheduled(cron = "0 8 14 * * *") // 定时任务执行
+    @Scheduled(cron = "0 0 8 * * *") // 定时任务执行
     public void sendHolidayGreeting() {
         Optional<String> opts = DateTools.haveItOrNot(LocalDate.now());
         if (opts.isEmpty()) return;
