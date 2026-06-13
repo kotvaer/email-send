@@ -12,8 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "email_log")
 public class EmailLog {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String taskId;
 
     private String recipient;
 
@@ -22,10 +21,10 @@ public class EmailLog {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    private LocalDateTime sendTime;
+    private String status;
 
-    private boolean success;
+    private int retryCount;
 
-    private String errorMessage;
+    private LocalDateTime createdAt;
 }
 
